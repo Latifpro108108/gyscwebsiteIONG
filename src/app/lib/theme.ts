@@ -60,6 +60,7 @@ export const NEWSLETTERS = [
 
 export const NAV_LINKS = [
   { label: "About", to: "/#about" },
+  { label: "Governance", to: "/#governance" },
   { label: "Our Work", to: "/#pillars" },
   { label: "Newsletter", to: "/#newsletter" },
   { label: "Founders", to: "/founders" },
@@ -90,7 +91,7 @@ export const FOOTER_COLUMNS = [
   {
     heading: "Legal",
     items: [
-      { label: "Privacy Policy", to: "/privacy" },
+      { label: "Privacy Policy", to: "/privacy-policy" },
       { label: "Terms of Use", to: "/terms" },
       { label: "NGO Registration", to: "/#about" },
     ],

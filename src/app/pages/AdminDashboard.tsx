@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router";
 import { ImagePlus, LogOut, Newspaper, Trash2, Type, Users } from "lucide-react";
+import { AdminLayout, AdminSection, AdminStatCard } from "@/app/components/admin/AdminLayout";
 import { useAuth } from "@/app/context/AuthContext";
 import { useContent } from "@/app/context/ContentContext";
-import { api, Founder, Newsletter } from "@/app/lib/api";
+import { api, AuthUser, Founder, Newsletter } from "@/app/lib/api";
 import { T } from "@/app/lib/theme";
 
-type Tab = "images" | "texts" | "founders" | "newsletters";
+type ContentTab = "images" | "texts";
 
 export function AdminDashboard() {
   const { user, isAdmin, logout } = useAuth();
   const { images, texts, founders, newsletters, refresh } = useContent();
-  const [tab, setTab] = useState<Tab>("images");
+  const [section, setSection] = useState<AdminSection>("dashboard");
+  const [contentTab, setContentTab] = useState<ContentTab>("texts");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -32,49 +34,235 @@ export function AdminDashboard() {
   }
 
   return (
-    <main className="site-main" style={{ background: T.surface }}>
-      <div className="container page-content">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16, marginBottom: 24 }}>
-          <div>
-            <p style={{ fontSize: 11, fontWeight: 800, color: T.teal, letterSpacing: "1.4px", textTransform: "uppercase" }}>Admin CMS</p>
-            <h1 style={{ fontSize: 28, fontWeight: 900, color: T.navy }}>Manage GYSC Website</h1>
-            <p style={{ fontSize: 14, color: T.muted, marginTop: 4 }}>Logged in as {user.email}</p>
-          </div>
-          <div style={{ display: "flex", gap: 10 }}>
-            <a href="/" className="btn btn-ghost btn-sm">View site</a>
-            <button className="btn btn-outline-teal btn-sm" onClick={logout}><LogOut size={14} /> Logout</button>
-          </div>
+    <AdminLayout section={section} onSection={setSection}>
+      <div className="admin-toolbar">
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 800, color: T.teal, letterSpacing: "1.4px", textTransform: "uppercase" }}>Admin CMS</p>
+          <h1 style={{ fontSize: 24, fontWeight: 900, color: T.navy }}>{sectionLabel(section)}</h1>
         </div>
-
-        {msg && (
-          <div style={{ background: msg.includes("fail") || msg.includes("Invalid") ? "#FEE2E2" : "#D1FAE5", color: msg.includes("fail") || msg.includes("Invalid") ? "#991B1B" : "#065F46", padding: "12px 16px", borderRadius: 8, marginBottom: 20, fontSize: 14 }}>
-            {msg}
-          </div>
-        )}
-
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
-          {([
-            ["images", "Images", ImagePlus],
-            ["texts", "Text Content", Type],
-            ["founders", "Founders", Users],
-            ["newsletters", "Newsletters", Newspaper],
-          ] as const).map(([id, label, Icon]) => (
-            <button
-              key={id}
-              className={`btn btn-sm ${tab === id ? "btn-primary" : "btn-ghost"}`}
-              onClick={() => setTab(id)}
-            >
-              <Icon size={14} /> {label}
-            </button>
-          ))}
+        <div style={{ display: "flex", gap: 10 }}>
+          <a href="/" className="btn btn-ghost btn-sm">View site</a>
+          <button className="btn btn-outline-teal btn-sm" type="button" onClick={() => void logout()}><LogOut size={14} /> Logout</button>
         </div>
-
-        {tab === "images" && <ImagesTab images={images} run={run} busy={busy} />}
-        {tab === "texts" && <TextsTab texts={texts} run={run} busy={busy} />}
-        {tab === "founders" && <FoundersTab founders={founders} run={run} busy={busy} />}
-        {tab === "newsletters" && <NewslettersTab newsletters={newsletters} run={run} busy={busy} />}
       </div>
-    </main>
+
+      {msg && (
+        <div style={{ background: msg.includes("fail") || msg.includes("Invalid") ? "#FEE2E2" : "#D1FAE5", color: msg.includes("fail") || msg.includes("Invalid") ? "#991B1B" : "#065F46", padding: "12px 16px", borderRadius: 8, marginBottom: 20, fontSize: 14 }}>
+          {msg}
+        </div>
+      )}
+
+      {section === "dashboard" && <DashboardPanel />}
+      {section === "members" && <MembersPanel />}
+      {section === "newsletter" && <NewslettersTab newsletters={newsletters} run={run} busy={busy} />}
+      {section === "content" && (
+        <>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
+            <button type="button" className={`btn btn-sm ${contentTab === "texts" ? "btn-primary" : "btn-ghost"}`} onClick={() => setContentTab("texts")}><Type size={14} /> Text Content</button>
+            <button type="button" className={`btn btn-sm ${contentTab === "images" ? "btn-primary" : "btn-ghost"}`} onClick={() => setContentTab("images")}><ImagePlus size={14} /> Images</button>
+          </div>
+          {contentTab === "texts" && <TextsTab texts={texts} run={run} busy={busy} />}
+          {contentTab === "images" && <ImagesTab images={images} run={run} busy={busy} />}
+        </>
+      )}
+      {section === "founders" && <FoundersTab founders={founders} run={run} busy={busy} />}
+      {section === "settings" && user.role === "super_admin" && <SettingsPanel />}
+    </AdminLayout>
+  );
+}
+
+function sectionLabel(s: AdminSection) {
+  const labels: Record<AdminSection, string> = {
+    dashboard: "Dashboard",
+    members: "Members",
+    newsletter: "Newsletter",
+    content: "Content Manager",
+    founders: "Founders",
+    settings: "Settings",
+  };
+  return labels[s];
+}
+
+function DashboardPanel() {
+  const [stats, setStats] = useState<Record<string, number>>({});
+  const [recent, setRecent] = useState<AuthUser[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.getDashboard()
+      .then(({ stats: s, recent: r }) => { setStats(s); setRecent(r); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p style={{ color: T.muted }}>Loading dashboard…</p>;
+
+  return (
+    <>
+      <div className="admin-stat-grid">
+        <AdminStatCard label="Total members" value={stats.totalMembers ?? 0} />
+        <AdminStatCard label="Newsletter subscribers" value={stats.subscribers ?? 0} />
+        <AdminStatCard label="New this month" value={stats.newThisMonth ?? 0} />
+        <AdminStatCard label="Active admins" value={stats.activeAdmins ?? 0} />
+      </div>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: T.navy, marginBottom: 12 }}>Recent registrations</h2>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Country</th><th>Joined</th></tr>
+          </thead>
+          <tbody>
+            {recent.length === 0 ? (
+              <tr><td colSpan={4} style={{ color: T.muted }}>No registrations yet.</td></tr>
+            ) : recent.map((m) => (
+              <tr key={m.id}>
+                <td>{m.name}</td>
+                <td>{m.email}</td>
+                <td>{m.country || "—"}</td>
+                <td>{m.status || "active"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function MembersPanel() {
+  const [members, setMembers] = useState<AuthUser[]>([]);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState<{ action: "suspend" | "delete" | "promote"; member: AuthUser } | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  function load(q = query) {
+    setLoading(true);
+    api.getMembers(q || undefined)
+      .then(setMembers)
+      .catch(() => setMembers([]))
+      .finally(() => setLoading(false));
+  }
+
+  useEffect(() => { load(""); }, []);
+
+  async function confirmAction() {
+    if (!modal) return;
+    setBusy(true);
+    try {
+      if (modal.action === "delete") {
+        await api.deleteMember(modal.member.id);
+      } else if (modal.action === "suspend") {
+        await api.updateMember(modal.member.id, { status: "suspended" });
+      } else {
+        await api.updateMember(modal.member.id, { role: "admin" });
+      }
+      setModal(null);
+      load();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Action failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <div className="admin-toolbar">
+        <input className="admin-search" placeholder="Search by name or email…" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && load()} />
+        <button type="button" className="btn btn-teal btn-sm" onClick={() => load()}>Search</button>
+      </div>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan={5}>Loading…</td></tr>
+            ) : members.length === 0 ? (
+              <tr><td colSpan={5} style={{ color: T.muted }}>No members found.</td></tr>
+            ) : members.map((m) => (
+              <tr key={m.id}>
+                <td>{m.name}</td>
+                <td>{m.email}</td>
+                <td>{m.role}</td>
+                <td>{m.status || "active"}</td>
+                <td>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => alert(`${m.name}\n${m.email}\n${m.country || ""}`)}>View</button>
+                    {m.role === "member" && (
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setModal({ action: "promote", member: m })}>Promote</button>
+                    )}
+                    {m.status !== "suspended" && (
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setModal({ action: "suspend", member: m })}>Suspend</button>
+                    )}
+                    <button type="button" className="btn btn-outline-teal btn-sm" onClick={() => setModal({ action: "delete", member: m })}>Delete</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {modal && (
+        <div className="admin-modal-backdrop" role="dialog">
+          <div className="admin-modal">
+            <h3>Confirm {modal.action}</h3>
+            <p>
+              {modal.action === "delete" && `Permanently delete ${modal.member.email}? This cannot be undone.`}
+              {modal.action === "suspend" && `Suspend ${modal.member.email}? They will lose access until reactivated.`}
+              {modal.action === "promote" && `Promote ${modal.member.email} to admin?`}
+            </p>
+            <div className="admin-modal-actions">
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setModal(null)} disabled={busy}>Cancel</button>
+              <button type="button" className="btn btn-primary btn-sm" onClick={() => void confirmAction()} disabled={busy}>Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function SettingsPanel() {
+  const [logs, setLogs] = useState<Awaited<ReturnType<typeof api.getAuditLog>>>([]);
+
+  useEffect(() => {
+    api.getAuditLog().then(setLogs).catch(() => setLogs([]));
+  }, []);
+
+  return (
+    <>
+      <div className="card" style={{ padding: 20, marginBottom: 24 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 800, color: T.navy, marginBottom: 8 }}>Super Admin</h2>
+        <p style={{ fontSize: 14, color: T.muted, lineHeight: 1.6 }}>
+          The super admin account (admin@gysc.ca) is read-only and cannot be modified or deleted through this panel.
+        </p>
+      </div>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: T.navy, marginBottom: 12 }}>Audit log</h2>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr><th>Time</th><th>Actor</th><th>Action</th><th>Target</th><th>IP</th></tr>
+          </thead>
+          <tbody>
+            {logs.length === 0 ? (
+              <tr><td colSpan={5} style={{ color: T.muted }}>No audit entries yet.</td></tr>
+            ) : logs.map((log, i) => (
+              <tr key={i}>
+                <td>{log.createdAt ? new Date(log.createdAt).toLocaleString() : "—"}</td>
+                <td>{log.actorEmail}</td>
+                <td>{log.action}</td>
+                <td>{log.target}</td>
+                <td>{log.ipAddress}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 

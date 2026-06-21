@@ -16,7 +16,7 @@ export function LoginPage() {
     setError("");
     try {
       const user = await login(email, password);
-      if (user.role === "admin") {
+      if (user.role === "admin" || user.role === "super_admin") {
         navigate("/admin");
       } else {
         navigate("/");
@@ -44,6 +44,9 @@ export function LoginPage() {
           <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
+        <p style={{ fontSize: 13, marginBottom: 16, color: "#64748B" }}>
+          Forgot your password? Contact <a href="mailto:privacy@gysc.ca" style={{ color: "#0f9f6f", fontWeight: 600 }}>privacy@gysc.ca</a> for assistance.
+        </p>
         <button className="btn btn-primary btn-fw" type="submit" disabled={loading}>
           {loading ? "Signing in..." : "Sign in"} <LogIn size={16} />
         </button>

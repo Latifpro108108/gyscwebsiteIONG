@@ -19,18 +19,24 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers["Content-Type"] = headers["Content-Type"] || "application/json";
   }
 
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const res = await fetch(`${API_BASE}${path}`, { ...options, headers, credentials: "include" });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || "Request failed");
+  if (!res.ok) throw new Error(data.message || data.error || "Request failed");
   return data as T;
 }
 
 export interface AuthUser {
   id: string;
+  firstName?: string;
+  lastName?: string;
   name: string;
   email: string;
-  role: "admin" | "member";
+  role: "member" | "admin" | "super_admin";
   country?: string;
+  dob?: string;
+  interests?: string[];
+  newsletterOptIn?: boolean;
+  status?: string;
 }
 
 export interface SiteImage {
@@ -81,6 +87,18 @@ export interface SiteContent {
   newsletters: Newsletter[];
 }
 
+export interface RegisterPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  country: string;
+  dob: string;
+  interests: string[];
+  hearAbout: string;
+  newsletterOptIn: boolean;
+}
+
 export const api = {
   getContent: () => request<SiteContent>("/content"),
 
@@ -90,11 +108,38 @@ export const api = {
       body: JSON.stringify({ email, password }),
     }),
 
-  register: (data: { name: string; email: string; password: string; country?: string }) =>
+  register: (data: RegisterPayload) =>
     request<{ token: string; user: AuthUser }>("/auth/register", {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  logout: () => request<{ message: string }>("/auth/logout", { method: "POST" }),
+
+  refresh: () => request<{ token: string; user: AuthUser }>("/auth/refresh", { method: "POST" }),
+
+  getDashboard: () =>
+    request<{ stats: Record<string, number>; recent: AuthUser[] }>("/admin/dashboard"),
+
+  getMembers: (q?: string) =>
+    request<AuthUser[]>(`/admin/members${q ? `?q=${encodeURIComponent(q)}` : ""}`),
+
+  updateMember: (id: string, data: { status?: string; role?: string }) =>
+    request<{ user: AuthUser }>(`/admin/members/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+
+  deleteMember: (id: string) =>
+    request<{ message: string }>(`/admin/members/${id}`, { method: "DELETE" }),
+
+  getAuditLog: () =>
+    request<{ actorEmail: string; actorRole: string; action: string; target: string; ipAddress: string; createdAt: string }[]>("/admin/audit-log"),
+
+  exportAccountData: () => request<{ exportedAt: string; data: AuthUser }>("/account/export"),
+
+  updateProfile: (data: Partial<Pick<AuthUser, "firstName" | "lastName" | "country" | "interests" | "newsletterOptIn">>) =>
+    request<{ user: AuthUser }>("/account/profile", { method: "PUT", body: JSON.stringify(data) }),
+
+  deleteAccount: (confirm: string) =>
+    request<{ message: string }>("/account/account", { method: "DELETE", body: JSON.stringify({ confirm }) }),
 
   updateText: (key: string, value: string) =>
     request<SiteText>(`/admin/texts/${key}`, { method: "PUT", body: JSON.stringify({ value }) }),

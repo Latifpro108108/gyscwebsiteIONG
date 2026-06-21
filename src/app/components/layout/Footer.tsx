@@ -1,4 +1,5 @@
 import { CanadaFlag } from "@/app/components/shared";
+import { openCookiePreferences } from "@/app/components/CookieConsent";
 import { useContent } from "@/app/context/ContentContext";
 import { useSiteNavigation } from "@/app/lib/navigation";
 import { FOOTER_COLUMNS, T } from "@/app/lib/theme";
@@ -34,6 +35,7 @@ export function Footer() {
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: 52, padding: "24px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
           <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13 }}>© {new Date().getFullYear()} Global Youth Sustainability Council. All rights reserved.</p>
           <button className="footer-link" onClick={() => goTo("/admin/login")} style={{ fontSize: 12 }}>Admin login</button>
+          <button className="footer-link" onClick={openCookiePreferences} style={{ fontSize: 12 }}>Cookie settings</button>
         </div>
       </div>
     </footer>

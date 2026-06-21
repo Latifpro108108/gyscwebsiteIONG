@@ -1826,3 +1826,469 @@ section[id] {
   border-color: #4287F5;
   box-shadow: 0 0 0 3px rgba(66, 135, 245, 0.12);
 }
+
+/* ── Hero two-column ── */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.hero-visual {
+  display: none;
+}
+
+.hero-side-image {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+}
+
+@media (min-width: 900px) {
+  .hero-grid {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 48px;
+  }
+
+  .hero-visual { display: block; }
+  .hero-copy { max-width: none; }
+}
+
+/* ── Governance ── */
+.gov-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .gov-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .gov-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.gov-card {
+  background: #fff;
+  border: 1px solid #DDE4EE;
+  border-radius: 8px;
+  padding: 24px 20px;
+  height: 100%;
+}
+
+.gov-card h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1B365D;
+  margin: 12px 0 8px;
+}
+
+.gov-card p {
+  font-size: 14px;
+  color: #64748B;
+  line-height: 1.65;
+}
+
+.gov-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #F4F7FC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── SDG strip ── */
+.sdg-strip {
+  background: #1B365D;
+  color: #fff;
+}
+
+.sdg-strip-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 8px;
+}
+
+.sdg-strip-title {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-bottom: 28px;
+}
+
+.sdg-strip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .sdg-strip-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .sdg-strip-grid { grid-template-columns: repeat(5, 1fr); }
+}
+
+.sdg-strip-item {
+  background: var(--sdg-color);
+  border-radius: 8px;
+  padding: 20px 16px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.sdg-strip-num {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.sdg-strip-name {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+  opacity: 0.95;
+}
+
+.sdg-strip-note {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 24px;
+}
+
+/* ── Cookie consent ── */
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: #fff;
+  border-top: 1px solid #DDE4EE;
+  box-shadow: 0 -8px 32px rgba(27, 54, 93, 0.12);
+  padding: 20px 0;
+}
+
+.cookie-banner-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.cookie-banner-inner p {
+  font-size: 14px;
+  color: #2D3748;
+  line-height: 1.65;
+  margin-bottom: 14px;
+  max-width: 720px;
+}
+
+.cookie-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cookie-prefs-title {
+  font-weight: 800;
+  color: #1B365D;
+  margin-bottom: 12px !important;
+}
+
+.cookie-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #2D3748;
+  margin-bottom: 8px;
+}
+
+/* ── Admin shell ── */
+.admin-shell {
+  display: flex;
+  min-height: calc(100vh - 0px);
+  background: #F4F7FC;
+}
+
+.admin-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #1B365D;
+  color: #fff;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-sidebar-brand {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+
+.admin-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.admin-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+
+.admin-sidebar-link:hover,
+.admin-sidebar-link.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.admin-sidebar-user {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  padding: 8px;
+  word-break: break-all;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 28px 32px;
+  overflow-x: auto;
+}
+
+.admin-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.admin-stat-card {
+  background: #fff;
+  border: 1px solid #DDE4EE;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.admin-stat-value {
+  font-size: 28px;
+  font-weight: 900;
+  color: #1B365D;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.admin-stat-label {
+  font-size: 13px;
+  color: #64748B;
+  font-weight: 600;
+}
+
+.admin-table-wrap {
+  background: #fff;
+  border: 1px solid #DDE4EE;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #EEF2F7;
+}
+
+.admin-table th {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #64748B;
+  background: #F8FAFC;
+}
+
+.admin-table tr:last-child td { border-bottom: none; }
+
+.admin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-search {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid #DDE4EE;
+  font-family: inherit;
+  font-size: 14px;
+  min-width: 220px;
+}
+
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 54, 93, 0.45);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.admin-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 24px 64px rgba(27, 54, 93, 0.2);
+}
+
+.admin-modal h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1B365D;
+  margin-bottom: 8px;
+}
+
+.admin-modal p {
+  font-size: 14px;
+  color: #64748B;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.admin-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .admin-shell { flex-direction: column; }
+  .admin-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .admin-sidebar-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex: unset;
+  }
+  .admin-main { padding: 20px 16px; }
+}
+
+/* ── Account settings ── */
+.account-panel {
+  background: #fff;
+  border: 1px solid #DDE4EE;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.account-panel h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1B365D;
+  margin-bottom: 12px;
+}
+
+.account-danger {
+  border-color: #FECACA;
+  background: #FFFBFB;
+}
+
+/* ── Registration steps ── */
+.reg-steps {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.reg-step {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: #DDE4EE;
+}
+
+.reg-step.done { background: #0f9f6f; }
+.reg-step.active { background: #4287F5; }
+
+.reg-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #2D3748;
+}
+
+.reg-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reg-chip {
+  padding: 8px 14px;
+  border-radius: 4px;
+  border: 1.5px solid #DDE4EE;
+  background: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2D3748;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.reg-chip.selected {
+  border-color: #0f9f6f;
+  background: rgba(15, 159, 111, 0.08);
+  color: #1B365D;
+}

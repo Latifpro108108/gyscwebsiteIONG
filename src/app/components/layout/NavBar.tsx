@@ -43,7 +43,8 @@ export function NavBar() {
                 <button className="nav-link" onClick={() => navigate("/admin")}>Admin</button>
               )}
               <span className="nav-user"><User size={14} /> {user.name.split(" ")[0]}</span>
-              <button className="btn btn-ghost btn-sm" onClick={logout}><LogOut size={14} /> Logout</button>
+              <button className="nav-link" onClick={() => navigate("/account")}>Account</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => void logout()}><LogOut size={14} /> Logout</button>
             </>
           ) : (
             <>
@@ -67,7 +68,8 @@ export function NavBar() {
             {user ? (
               <>
                 {isAdmin && <button className="btn btn-ghost btn-fw" onClick={() => navigate("/admin")}>Admin panel</button>}
-                <button className="btn btn-outline-teal btn-fw" onClick={logout}>Logout</button>
+                <button className="btn btn-ghost btn-fw" onClick={() => navigate("/account")}>Account</button>
+                <button className="btn btn-outline-teal btn-fw" onClick={() => void logout()}>Logout</button>
               </>
             ) : (
               <>

@@ -1,11 +1,14 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import { seedDatabase } from "./seed/seed.js";
 import authRoutes from "./routes/auth.js";
+import accountRoutes from "./routes/account.js";
 import contentRoutes from "./routes/content.js";
 import adminRoutes from "./routes/admin.js";
+import { securityHeaders, loginLimiter } from "./middleware/security.js";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
@@ -20,6 +23,7 @@ function isAllowedOrigin(origin) {
   return /^http:\/\/localhost:\d+$/.test(origin) || /^http:\/\/127\.0\.0\.1:\d+$/.test(origin);
 }
 
+app.use(securityHeaders);
 app.use(
   cors({
     origin(origin, callback) {
@@ -28,12 +32,14 @@ app.use(
     credentials: true,
   }),
 );
+app.use(cookieParser());
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/account", accountRoutes);
 app.use("/api/content", contentRoutes);
 app.use("/api/admin", adminRoutes);
 
@@ -58,9 +64,7 @@ async function start() {
     console.log(`GYSC API running on http://localhost:${PORT}`);
   } catch (err) {
     if (err && typeof err === "object" && "code" in err && err.code === "EADDRINUSE") {
-      console.error(`Port ${PORT} is already in use.`);
-      console.error("Stop the other server (Ctrl+C in its terminal) or run:");
-      console.error(`  npx kill-port ${PORT}`);
+      console.error(`Port ${PORT} is already in use. Run: npx kill-port ${PORT}`);
       process.exit(1);
     }
     throw err;

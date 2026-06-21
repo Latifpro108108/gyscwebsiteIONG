@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
-  ArrowRight, ArrowUpRight, Compass, FileText, Globe, Leaf, Lock, UserCircle, Users,
+  ArrowRight, ArrowUpRight, Compass, FileText, Globe, Landmark, Leaf, Lock, MapPin, UserCircle, Users,
 } from "lucide-react";
 import { NewsletterSection } from "@/app/components/NewsletterSection";
-import { SDGWheel } from "@/app/components/SDGWheel";
+import { SDGStrip } from "@/app/components/SDGStrip";
 import { Label, Reveal, SectionIntro } from "@/app/components/shared";
 import { useContent } from "@/app/context/ContentContext";
 import { useSiteNavigation } from "@/app/lib/navigation";
@@ -37,9 +37,16 @@ export function HomePage() {
 
   const stats = [
     { n: text("stat_1_n", "9"), label: text("stat_1_label", "Founding Members") },
-    { n: text("stat_2_n", "14"), label: text("stat_2_label", "Countries") },
-    { n: text("stat_3_n", "95"), label: text("stat_3_label", "Pages in Declaration") },
+    { n: text("stat_2_n", "95"), label: text("stat_2_label", "Page Policy Framework") },
+    { n: text("stat_3_n", "14"), label: text("stat_3_label", "Countries") },
     { n: text("stat_4_n", "1"), label: text("stat_4_label", "Official Declaration") },
+  ];
+
+  const governance = [
+    { Icon: Users, title: "General Assembly", body: "The supreme deliberative body representing all member delegates." },
+    { Icon: Globe, title: "National Councils", body: "Country-level chapters coordinating local youth policy engagement." },
+    { Icon: MapPin, title: "Local Offices", body: "Community hubs for programmes, forums, and delegate support." },
+    { Icon: Landmark, title: "Leadership Team", body: "Elected officers guiding strategy, operations, and global representation." },
   ];
 
   const pillars = [
@@ -65,29 +72,35 @@ export function HomePage() {
         </div>
 
         <div className="container hero-content">
-          <div className="hero-copy">
-            <div className="hero-eyebrow anim-slide-right">
-              <span className="eyebrow-bar" />
-              <span>{text("hero_eyebrow", "Global Youth Sustainability Council")}</span>
+          <div className="hero-grid">
+            <div className="hero-copy">
+              <div className="hero-eyebrow anim-slide-right">
+                <span className="eyebrow-bar" />
+                <span>{text("hero_eyebrow", "Global Youth Sustainability Council")}</span>
+              </div>
+
+              <h1 className="hero-title">
+                <span className="hero-line anim-fade-up d1">{text("hero_line1", "Young people.")}</span>
+                <span className="hero-line anim-fade-up d2">
+                  <span className="hero-highlight">
+                    {text("hero_line2", "Real policy.")}
+                    <span className="hero-underline anim-line-grow" />
+                  </span>
+                </span>
+                <span className="hero-line anim-fade-up d3">{text("hero_line3", "Global impact.")}</span>
+              </h1>
+
+              <p className="hero-desc anim-fade-up d4">{text("hero_description", "")}</p>
+
+              <div className="hero-btns anim-fade-up d5">
+                <button className="btn btn-white" onClick={() => goTo("/register")}>Join GYSC <ArrowRight size={16} /></button>
+                <button className="btn btn-outline-white" onClick={() => goTo("/partner")}>Partner With Us</button>
+                <button className="btn btn-outline-white" onClick={() => goTo("/#about")}>About GYSC</button>
+              </div>
             </div>
 
-            <h1 className="hero-title">
-              <span className="hero-line anim-fade-up d1">{text("hero_line1", "Young people.")}</span>
-              <span className="hero-line anim-fade-up d2">
-                <span className="hero-highlight">
-                  {text("hero_line2", "Real policy.")}
-                  <span className="hero-underline anim-line-grow" />
-                </span>
-              </span>
-              <span className="hero-line anim-fade-up d3">{text("hero_line3", "Global impact.")}</span>
-            </h1>
-
-            <p className="hero-desc anim-fade-up d4">{text("hero_description", "")}</p>
-
-            <div className="hero-btns anim-fade-up d5">
-              <button className="btn btn-white" onClick={() => goTo("/register")}>Join GYSC <ArrowRight size={16} /></button>
-              <button className="btn btn-outline-white" onClick={() => goTo("/login")}>Member Login</button>
-              <button className="btn btn-outline-white" onClick={() => goTo("/partner")}>Partner With Us</button>
+            <div className="hero-visual anim-fade-up d4">
+              <img src={heroBg} alt="" className="hero-side-image" />
             </div>
           </div>
         </div>
@@ -149,6 +162,26 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* ── GOVERNANCE ── */}
+      <section id="governance" className="section section-surface">
+        <div className="container">
+          <Reveal>
+            <SectionIntro label="Governance" title="How GYSC is structured" description="A transparent model connecting local youth voices to global policy work." />
+          </Reveal>
+          <div className="gov-grid">
+            {governance.map(({ Icon, title, body }, i) => (
+              <Reveal key={title} delay={i * 70}>
+                <div className="gov-card">
+                  <div className="gov-icon"><Icon size={22} color={T.navy} strokeWidth={1.5} /></div>
+                  <h3>{title}</h3>
+                  <p>{body}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── PILLARS ── */}
       <section id="pillars" className="section section-surface">
         <div className="container">
@@ -169,23 +202,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ── SDG ── */}
-      <section id="sdg" className="section-tight section-sdg">
-        <div className="sdg-grid-bg" aria-hidden />
-        <div className="container sdg-inner">
-          <Reveal>
-            <div className="section-header-row">
-              <div>
-                <Label light>UN Sustainable Development Goals</Label>
-                <h2 className="sdg-title">Every goal. Every action.</h2>
-                <p className="sdg-hint">Scroll to spin the wheel · hover any tile to explore</p>
-              </div>
-            </div>
-          </Reveal>
-          <SDGWheel />
-          <p className="sdg-disclaimer">GYSC operates in alignment with — not on behalf of — the United Nations.</p>
-        </div>
-      </section>
+      <SDGStrip />
 
       {/* ── NEWSLETTER ── */}
       <section id="newsletter" className="section section-white">

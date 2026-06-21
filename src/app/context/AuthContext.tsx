@@ -1,13 +1,13 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { api, AuthUser, setToken } from "@/app/lib/api";
+import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { api, AuthUser, RegisterPayload, setToken } from "@/app/lib/api";
 
 interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
-  register: (data: { name: string; email: string; password: string; country?: string }) => Promise<AuthUser>;
-  logout: () => void;
+  register: (data: RegisterPayload) => Promise<AuthUser>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const register = useCallback(async (data: { name: string; email: string; password: string; country?: string }) => {
+  const register = useCallback(async (data: RegisterPayload) => {
     setLoading(true);
     try {
       const { token, user: u } = await api.register(data);
@@ -48,10 +48,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const logout = useCallback(() => persist(null, null), []);
+  const logout = useCallback(async () => {
+    try {
+      await api.logout();
+    } catch {
+      /* clear local session anyway */
+    }
+    persist(null, null);
+  }, []);
 
   const value = useMemo(
-    () => ({ user, loading, isAdmin: user?.role === "admin", login, register, logout }),
+    () => ({
+      user,
+      loading,
+      isAdmin: user?.role === "admin" || user?.role === "super_admin",
+      login,
+      register,
+      logout,
+    }),
     [user, loading, login, register, logout],
   );
 

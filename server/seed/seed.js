@@ -59,10 +59,10 @@ const DEFAULT_TEXTS = [
   },
   { key: "stat_1_n", label: "Stats — Founding Members Number", section: "stats", value: "9" },
   { key: "stat_1_label", label: "Stats — Founding Members Label", section: "stats", value: "Founding Members" },
-  { key: "stat_2_n", label: "Stats — Countries Number", section: "stats", value: "14" },
-  { key: "stat_2_label", label: "Stats — Countries Label", section: "stats", value: "Countries" },
-  { key: "stat_3_n", label: "Stats — Policy Doc Number", section: "stats", value: "95" },
-  { key: "stat_3_label", label: "Stats — Policy Doc Label", section: "stats", value: "Pages in Declaration" },
+  { key: "stat_2_n", label: "Stats — Countries Number", section: "stats", value: "95" },
+  { key: "stat_2_label", label: "Stats — Policy Framework Label", section: "stats", value: "Page Policy Framework" },
+  { key: "stat_3_n", label: "Stats — Countries Number", section: "stats", value: "14" },
+  { key: "stat_3_label", label: "Stats — Countries Label", section: "stats", value: "Countries" },
   { key: "stat_4_n", label: "Stats — Declaration Number", section: "stats", value: "1" },
   { key: "stat_4_label", label: "Stats — Declaration Label", section: "stats", value: "Official Declaration" },
   { key: "pillars_title", label: "Our Work — Section Title", section: "pillars", value: "What we stand for" },
@@ -123,14 +123,26 @@ const DEFAULT_NEWSLETTERS = [
 ];
 
 export async function seedDatabase() {
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@gysc.com";
-  const adminPassword = process.env.ADMIN_PASSWORD || "gyscc123";
+  const superEmail = (process.env.SUPER_ADMIN_EMAIL || process.env.ADMIN_EMAIL || "admin@gysc.ca").toLowerCase();
+  const superPassword = process.env.SUPER_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || "gyscc123";
 
-  const existingAdmin = await User.findOne({ email: adminEmail });
-  if (!existingAdmin) {
-    const hash = await bcrypt.hash(adminPassword, 12);
-    await User.create({ name: "GYSC Admin", email: adminEmail, password: hash, role: "admin", country: "Canada" });
-    console.log("Admin account seeded:", adminEmail);
+  let superAdmin = await User.findOne({ email: superEmail });
+  if (!superAdmin) {
+    const hash = await bcrypt.hash(superPassword, 12);
+    superAdmin = await User.create({
+      firstName: "GYSC",
+      lastName: "Admin",
+      name: "GYSC Admin",
+      email: superEmail,
+      password: hash,
+      role: "super_admin",
+      status: "active",
+      country: "Canada",
+    });
+    console.log("Super admin seeded:", superEmail);
+  } else if (superAdmin.role !== "super_admin") {
+    superAdmin.role = "super_admin";
+    await superAdmin.save();
   }
 
   for (const img of DEFAULT_IMAGES) {

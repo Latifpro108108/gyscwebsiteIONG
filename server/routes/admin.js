@@ -4,13 +4,104 @@ import SiteImage from "../models/SiteImage.js";
 import SiteText from "../models/SiteText.js";
 import Founder from "../models/Founder.js";
 import Newsletter from "../models/Newsletter.js";
+import User from "../models/User.js";
+import AuditLog from "../models/AuditLog.js";
 import { uploadImage, uploadFile, deleteAsset } from "../config/cloudinary.js";
-import { authRequired, adminRequired } from "../middleware/auth.js";
+import { authRequired, adminRequired, blockSuperAdminTarget, superAdminRequired } from "../middleware/auth.js";
+import { isSuperAdminEmail, publicUser } from "../utils/tokens.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 router.use(authRequired, adminRequired);
+
+/* ── Dashboard ── */
+router.get("/dashboard", async (_req, res) => {
+  try {
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+
+    const [totalMembers, subscribers, newThisMonth, activeAdmins, recent] = await Promise.all([
+      User.countDocuments({ role: "member", status: { $ne: "deleted" } }),
+      User.countDocuments({ newsletterOptIn: true, status: "active" }),
+      User.countDocuments({ role: "member", createdAt: { $gte: monthStart } }),
+      User.countDocuments({ role: { $in: ["admin", "super_admin"] }, status: "active" }),
+      User.find({ role: "member" }).sort({ createdAt: -1 }).limit(10).select("-password"),
+    ]);
+
+    res.json({
+      stats: { totalMembers, subscribers, newThisMonth, activeAdmins },
+      recent: recent.map(publicUser),
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+/* ── Members ── */
+router.get("/members", async (req, res) => {
+  try {
+    const q = String(req.query.q || "").trim();
+    const filter = { role: { $in: ["member", "admin"] } };
+    if (q) {
+      filter.$or = [{ name: new RegExp(q, "i") }, { email: new RegExp(q, "i") }];
+    }
+    const members = await User.find(filter).select("-password").sort({ createdAt: -1 });
+    res.json(members.map(publicUser));
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.patch("/members/:id", blockSuperAdminTarget, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "Member not found" });
+    if (isSuperAdminEmail(user.email)) {
+      return res.status(403).json({ error: "This account cannot be modified." });
+    }
+
+    const { status, role } = req.body;
+    if (status) user.status = status;
+    if (role && ["member", "admin"].includes(role)) user.role = role;
+
+    await user.save();
+    await AuditLog.create({
+      actorEmail: req.user.email,
+      actorRole: req.user.role,
+      action: "member_update",
+      target: user.email,
+      ipAddress: req.ip,
+    });
+    res.json({ user: publicUser(user) });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.delete("/members/:id", blockSuperAdminTarget, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "Member not found" });
+    if (isSuperAdminEmail(user.email)) {
+      return res.status(403).json({ error: "This account cannot be modified." });
+    }
+    await user.deleteOne();
+    res.json({ message: "Member deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.get("/audit-log", superAdminRequired, async (_req, res) => {
+  try {
+    const logs = await AuditLog.find().sort({ createdAt: -1 }).limit(100);
+    res.json(logs);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 /* ── Site Images ── */
 router.put("/images/:key", upload.single("image"), async (req, res) => {

@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { Layout } from "@/app/components/layout/Layout";
 import { AdminDashboard } from "@/app/pages/AdminDashboard";
+import { AccountSettingsPage } from "@/app/pages/AccountSettingsPage";
 import { AdminLoginPage } from "@/app/pages/AdminLoginPage";
 import { FoundersPage } from "@/app/pages/FoundersPage";
 import { HomePage } from "@/app/pages/HomePage";
@@ -40,8 +41,11 @@ export default function App() {
           <Route path="newsletters/:id" element={<NewsletterReaderPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
+          <Route path="account" element={<AccountSettingsPage />} />
+          <Route path="account/settings" element={<AccountSettingsPage />} />
           <Route path="partner" element={<PartnerPage />} />
           <Route path="privacy" element={<PrivacyPage />} />
+          <Route path="privacy-policy" element={<PrivacyPage />} />
           <Route path="terms" element={<TermsPage />} />
           <Route path="admin/login" element={<AdminLoginPage />} />
           <Route path="admin" element={<AdminDashboard />} />
