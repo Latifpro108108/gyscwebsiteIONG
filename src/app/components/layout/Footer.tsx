@@ -1,5 +1,6 @@
 import { CanadaFlag } from "@/app/components/shared";
 import { openCookiePreferences } from "@/app/components/CookieConsent";
+import { useAuth } from "@/app/context/AuthContext";
 import { useContent } from "@/app/context/ContentContext";
 import { useSiteNavigation } from "@/app/lib/navigation";
 import { FOOTER_COLUMNS, T } from "@/app/lib/theme";
@@ -7,6 +8,7 @@ import { FOOTER_COLUMNS, T } from "@/app/lib/theme";
 export function Footer() {
   const { goTo } = useSiteNavigation();
   const { text } = useContent();
+  const { user, logout } = useAuth();
 
   return (
     <footer style={{ background: T.navy, paddingTop: 56 }}>
@@ -24,18 +26,36 @@ export function Footer() {
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.heading}>
               <p style={{ color: "#fff", fontWeight: 800, fontSize: 11, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 22 }}>{col.heading}</p>
-              {col.items.map((item) => (
-                <div key={item.label} style={{ marginBottom: 13 }}>
-                  <button className="footer-link" onClick={() => goTo(item.to)}>{item.label}</button>
-                </div>
-              ))}
+              {col.items.map((item) => {
+                if (item.label === "Member Login" && user) return null;
+                return (
+                  <div key={item.label} style={{ marginBottom: 13 }}>
+                    <button className="footer-link" onClick={() => goTo(item.to)}>{item.label}</button>
+                  </div>
+                );
+              })}
+              {col.heading === "Initiatives" && user && (
+                <>
+                  <div style={{ marginBottom: 13 }}>
+                    <button className="footer-link" onClick={() => goTo("/account")}>My account</button>
+                  </div>
+                  <div style={{ marginBottom: 13 }}>
+                    <button className="footer-link" onClick={() => void logout()}>Log out</button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>
-        <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: 52, padding: "24px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13 }}>© {new Date().getFullYear()} Global Youth Sustainability Council. All rights reserved.</p>
-          <button className="footer-link" onClick={() => goTo("/admin/login")} style={{ fontSize: 12 }}>Admin login</button>
-          <button className="footer-link" onClick={openCookiePreferences} style={{ fontSize: 12 }}>Cookie settings</button>
+        <div className="foot-bottom">
+          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13 }}>© {new Date().getFullYear()} Global Youth Sustainability Council.</p>
+          <div className="foot-bottom-links">
+            {user && (
+              <button className="footer-link" onClick={() => goTo("/account")} style={{ fontSize: 12 }}>Account</button>
+            )}
+            <button className="footer-link" onClick={() => goTo("/admin/login")} style={{ fontSize: 12 }}>Admin</button>
+            <button className="footer-link" onClick={openCookiePreferences} style={{ fontSize: 12 }}>Cookies</button>
+          </div>
         </div>
       </div>
     </footer>

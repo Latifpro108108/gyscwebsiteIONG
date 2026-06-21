@@ -102,10 +102,10 @@ export function CanadaFlag({ size = 28 }: { size?: number }) {
   );
 }
 
-export function PageShell({ children }: { children: React.ReactNode }) {
+export function PageShell({ children, narrow }: { children: React.ReactNode; narrow?: boolean }) {
   return (
     <main className="site-main" style={{ background: "#fff" }}>
-      <div className="container page-content">{children}</div>
+      <div className={`container page-content${narrow ? " page-content-narrow" : ""}`}>{children}</div>
     </main>
   );
 }

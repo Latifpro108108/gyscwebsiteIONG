@@ -185,7 +185,7 @@ section[id] {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 72px;
+  height: 64px;
 }
 
 .nav-logo-btn {
@@ -2241,6 +2241,132 @@ section[id] {
 .account-danger {
   border-color: #FECACA;
   background: #FFFBFB;
+}
+
+.page-content-narrow {
+  max-width: 420px;
+}
+
+.account-minimal {
+  padding: 8px 0 48px;
+}
+
+.account-minimal h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1B365D;
+  margin-bottom: 4px;
+}
+
+.account-email {
+  font-size: 14px;
+  color: #64748B;
+  margin-bottom: 24px;
+}
+
+.account-muted {
+  font-size: 14px;
+  color: #64748B;
+  margin-bottom: 16px;
+}
+
+.account-msg {
+  font-size: 13px;
+  color: #0f9f6f;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.account-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.account-fields input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #DDE4EE;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.account-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #2D3748;
+  margin-bottom: 16px;
+}
+
+.account-save {
+  margin-bottom: 24px;
+}
+
+.account-extra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #64748B;
+}
+
+.account-text-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 13px;
+  color: #64748B;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.account-text-btn:hover {
+  color: #1B365D;
+}
+
+.account-text-danger {
+  color: #991B1B;
+}
+
+.account-delete {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.account-delete input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #FECACA;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.foot-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 52px;
+  padding: 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.foot-bottom-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 /* ── Registration steps ── */

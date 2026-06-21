@@ -60,9 +60,6 @@ export const NEWSLETTERS = [
 
 export const NAV_LINKS = [
   { label: "About", to: "/#about" },
-  { label: "Governance", to: "/#governance" },
-  { label: "Our Work", to: "/#pillars" },
-  { label: "Newsletter", to: "/#newsletter" },
   { label: "Founders", to: "/founders" },
   { label: "Donate", to: "/#donate" },
 ] as const;
