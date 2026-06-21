@@ -2,13 +2,19 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import { seedDatabase } from "./seed/seed.js";
 import authRoutes from "./routes/auth.js";
 import accountRoutes from "./routes/account.js";
 import contentRoutes from "./routes/content.js";
 import adminRoutes from "./routes/admin.js";
-import { securityHeaders, loginLimiter } from "./middleware/security.js";
+import { securityHeaders } from "./middleware/security.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const distPath = path.join(__dirname, "..", "dist");
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
@@ -43,6 +49,16 @@ app.use("/api/account", accountRoutes);
 app.use("/api/content", contentRoutes);
 app.use("/api/admin", adminRoutes);
 
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath, { index: false }));
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api")) return next();
+    res.sendFile(path.join(distPath, "index.html"), (err) => {
+      if (err) next(err);
+    });
+  });
+}
+
 app.use((err, _req, res, _next) => {
   console.error(err);
   res.status(500).json({ message: err.message || "Server error" });
@@ -50,7 +66,7 @@ app.use((err, _req, res, _next) => {
 
 function listen(port) {
   return new Promise((resolve, reject) => {
-    const server = app.listen(port, () => resolve(server));
+    const server = app.listen(port, "0.0.0.0", () => resolve(server));
     server.on("error", reject);
   });
 }
@@ -61,7 +77,8 @@ async function start() {
 
   try {
     await listen(PORT);
-    console.log(`GYSC API running on http://localhost:${PORT}`);
+    const mode = fs.existsSync(distPath) ? "full stack" : "API only";
+    console.log(`GYSC ${mode} running on port ${PORT}`);
   } catch (err) {
     if (err && typeof err === "object" && "code" in err && err.code === "EADDRINUSE") {
       console.error(`Port ${PORT} is already in use. Run: npx kill-port ${PORT}`);
