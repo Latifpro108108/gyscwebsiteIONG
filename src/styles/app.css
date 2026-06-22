@@ -6,6 +6,9 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-size: 16px;
 }
 
 body {
@@ -14,6 +17,8 @@ body {
   color: #1B365D;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 #root {
@@ -1784,6 +1789,33 @@ section[id] {
   .hero-btns .btn { width: 100%; }
   .founders-strip-grid { grid-template-columns: repeat(2, 1fr); }
   .subscribe-banner { flex-direction: column; align-items: stretch; }
+
+  .container { padding: 0 18px; }
+
+  .hero-title {
+    font-size: clamp(40px, 11vw, 62px);
+    letter-spacing: -1px;
+  }
+
+  .hero-desc { font-size: 17px; line-height: 1.7; }
+  .hero-eyebrow { font-size: 13px; }
+
+  .section-intro h2 { font-size: clamp(28px, 7.5vw, 36px); }
+  .section-intro p { font-size: 17px; max-width: none; }
+
+  .nav-link { font-size: 16px; padding: 12px 14px; }
+  .mob-nav-link { font-size: 17px !important; padding: 14px 14px !important; }
+
+  .btn { height: 50px; font-size: 15px; }
+  .btn-sm { height: 44px; font-size: 14px; }
+
+  .stat-n { font-size: clamp(36px, 9vw, 48px); }
+  .stat-label { font-size: 14px; }
+
+  .pillar-title { font-size: 18px; }
+  .body-text { font-size: 16px; line-height: 1.7; }
+
+  .footer-link { font-size: 15px; }
 }
 
 .legal-content { max-width: 720px; }
