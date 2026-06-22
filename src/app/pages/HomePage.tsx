@@ -3,7 +3,7 @@ import {
   ArrowRight, ArrowUpRight, Compass, FileText, Globe, Landmark, Leaf, Lock, MapPin, UserCircle, Users,
 } from "lucide-react";
 import { NewsletterSection } from "@/app/components/NewsletterSection";
-import { SDGStrip } from "@/app/components/SDGStrip";
+import { SDGWheel } from "@/app/components/SDGWheel";
 import { Label, Reveal, SectionIntro } from "@/app/components/shared";
 import { useContent } from "@/app/context/ContentContext";
 import { useSiteNavigation } from "@/app/lib/navigation";
@@ -202,7 +202,23 @@ export function HomePage() {
         </div>
       </section>
 
-      <SDGStrip />
+      {/* ── SDG ── */}
+      <section id="sdg" className="section-tight section-sdg">
+        <div className="sdg-grid-bg" aria-hidden />
+        <div className="container sdg-inner">
+          <Reveal>
+            <div className="section-header-row">
+              <div>
+                <Label light>UN Sustainable Development Goals</Label>
+                <h2 className="sdg-title">Every goal. Every action.</h2>
+                <p className="sdg-hint">Scroll to spin the wheel · hover any tile to explore</p>
+              </div>
+            </div>
+          </Reveal>
+          <SDGWheel />
+          <p className="sdg-disclaimer">GYSC operates in alignment with — not on behalf of — the United Nations.</p>
+        </div>
+      </section>
 
       {/* ── NEWSLETTER ── */}
       <section id="newsletter" className="section section-white">
