@@ -1,5 +1,5 @@
 import { CanadaFlag } from "@/app/components/shared";
-import { openCookiePreferences } from "@/app/components/CookieConsent";
+
 import { useAuth } from "@/app/context/AuthContext";
 import { useContent } from "@/app/context/ContentContext";
 import { useSiteNavigation } from "@/app/lib/navigation";
@@ -53,7 +53,6 @@ export function Footer() {
             {user && (
               <button className="footer-link" onClick={() => goTo("/account")} style={{ fontSize: 12 }}>Account</button>
             )}
-            <button className="footer-link" onClick={openCookiePreferences} style={{ fontSize: 12 }}>Cookies</button>
           </div>
         </div>
       </div>
