@@ -27,7 +27,7 @@ async function issueSession(res, user) {
     expiresAt: refreshExpiryDate(),
   });
   res.cookie("gysc_refresh", refreshToken, cookieOptions(7 * 24 * 60 * 60 * 1000));
-  res.cookie("gysc_access", accessToken, cookieOptions(15 * 60 * 1000));
+  res.cookie("gysc_access", accessToken, cookieOptions(24 * 60 * 60 * 1000));
   return { accessToken, user: publicUser(user) };
 }
 
@@ -113,7 +113,7 @@ router.post("/refresh", async (req, res) => {
     }
 
     const accessToken = signAccessToken(user);
-    res.cookie("gysc_access", accessToken, cookieOptions(15 * 60 * 1000));
+    res.cookie("gysc_access", accessToken, cookieOptions(24 * 60 * 60 * 1000));
     res.json({ token: accessToken, user: publicUser(user) });
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -10,14 +10,7 @@ import { useContent } from "@/app/context/ContentContext";
 import { useSiteNavigation } from "@/app/lib/navigation";
 import { T } from "@/app/lib/theme";
 
-const STORY_QUOTE =
-  "One shared conviction — youth deserve a permanent seat at the global policy table.";
 
-const STORY_PARAGRAPHS = [
-  "In 2025, at a youth summit in South Korea, our co-founders joined a larger global cohort for five days of intensive dialogue. Together they helped shape a bold policy document — and laid the foundations for the Global Youth Sustainability Council.",
-  "GYSC co-authored the Eunpyeong Declaration alongside peers from all corners of the world — a framework addressing education, climate, inequality, and institutional reform.",
-  "Registered as a Canadian NGO, GYSC brings together members from different countries around the world — raising awareness, deepening engagement, and amplifying youth voices in global conversations.",
-];
 
 export function HomePage() {
   const { goTo } = useSiteNavigation();
@@ -206,22 +199,24 @@ export function HomePage() {
 
               <h1 className="hero-title">
                 <span className="hero-line anim-fade-up d1">
-                  <span style={{color: '#0f9f6f'}}>Young</span> people.
+                  <span style={{color: '#0f9f6f'}}>{text("hero_line1", "Young people.").split(' ')[0]}</span> {text("hero_line1", "Young people.").split(' ').slice(1).join(' ')}
                 </span>
                 <span className="hero-line anim-fade-up d2">
                   <span className="hero-highlight">
-                    <span style={{color: '#38bdf8'}}>Real</span> policy.
+                    <span style={{color: '#38bdf8'}}>{text("hero_line2", "Real policy.").split(' ')[0]}</span> {text("hero_line2", "Real policy.").split(' ').slice(1).join(' ')}
                     <span className="hero-underline anim-line-grow" />
                   </span>
                 </span>
                 <span className="hero-line anim-fade-up d3">
-                  <span style={{color: '#fbbf24'}}>Global</span> impact.
+                  <span style={{color: '#fbbf24'}}>{text("hero_line3", "Global impact.").split(' ')[0]}</span> {text("hero_line3", "Global impact.").split(' ').slice(1).join(' ')}
                 </span>
               </h1>
 
-              <p className="hero-desc anim-fade-up d4">
-                GYSC unites delegates from every continent — turning <span style={{color: '#0f9f6f', fontWeight: '600'}}>youth conviction</span> into policies that reach the highest levels of <span style={{color: '#0f9f6f', fontWeight: '600'}}>global governance</span>.
-              </p>
+              <p className="hero-desc anim-fade-up d4" dangerouslySetInnerHTML={{ 
+                __html: text("hero_description", "GYSC unites delegates from every continent — turning youth conviction into policies that reach the highest levels of global governance.")
+                  .replace("youth conviction", "<span style='color: #0f9f6f; font-weight: 600'>youth conviction</span>")
+                  .replace("global governance", "<span style='color: #0f9f6f; font-weight: 600'>global governance</span>")
+              }} />
 
               <div className="hero-btns anim-fade-up d5">
                 <button className="btn btn-white" onClick={() => goTo("/register")}>Join GYSC <ArrowRight size={16} /></button>
@@ -261,13 +256,13 @@ export function HomePage() {
                 <Label>Our Story</Label>
                 <blockquote className="story-quote">
                   <span className="story-quote-glyph" aria-hidden>"</span>
-                  {STORY_QUOTE}
+                  {text("about_quote", "One shared conviction — youth deserve a permanent seat at the global policy table.")}
                 </blockquote>
                 <div className="story-paragraphs">
-                  {STORY_PARAGRAPHS.map((para, i) => (
-                    <p key={i} className="story-para">
+                  {(["about_p1", "about_p2", "about_p3"] as const).map((key, i) => (
+                    <p key={key} className="story-para">
                       <span className="story-para-index">{String(i + 1).padStart(2, "0")}</span>
-                      {para}
+                      {text(key, "")}
                     </p>
                   ))}
                 </div>
@@ -299,13 +294,13 @@ export function HomePage() {
               <div className="gov-left-label">GOVERNANCE</div>
               <div className="gov-left-bar-container">
                 <div className="gov-left-bar" />
-                <h2 className="gov-left-heading">How GYSC is Structured</h2>
+                <h2 className="gov-left-heading">{text("gov_title", "How GYSC is Structured")}</h2>
               </div>
               <p className="gov-left-body">
-                A four-tier structure designed for democratic participation at every level — from community projects to international policy.
+                {text("gov_desc", "A four-tier structure designed for democratic participation at every level — from community projects to international policy.")}
               </p>
               <hr className="gov-left-hr" />
-              <div className="gov-left-stat">4 levels of governance</div>
+              <div className="gov-left-stat">{text("gov_stat", "4 levels of governance")}</div>
             </div>
 
             {/* Right Column (60%) */}
@@ -338,28 +333,22 @@ export function HomePage() {
             {/* Policy card */}
             <article className="pillar-card policy-card animating hidden-anim">
               <div className="pillar-accent-bar" />
-              <h3 className="pillar-name">Policy</h3>
-              <p className="pillar-body">
-                We advocate for youth-led policy recommendations in international frameworks and governmental processes.
-              </p>
+              <h3 className="pillar-name">{text("pillar_1_title", "Policy")}</h3>
+              <p className="pillar-body">{text("pillar_1_body", "We advocate for youth-led policy recommendations in international frameworks and governmental processes.")}</p>
             </article>
 
             {/* Leadership card */}
             <article className="pillar-card leadership-card animating hidden-anim">
               <div className="pillar-accent-bar" />
-              <h3 className="pillar-name">Leadership</h3>
-              <p className="pillar-body">
-                We build awareness, create spaces for engagement, and empower young people to raise their voices at local, national, and international levels.
-              </p>
+              <h3 className="pillar-name">{text("pillar_2_title", "Leadership")}</h3>
+              <p className="pillar-body">{text("pillar_2_body", "We build awareness, create spaces for engagement, and empower young people to raise their voices at local, national, and international levels.")}</p>
             </article>
 
             {/* Sustainability card */}
             <article className="pillar-card sustainability-card animating hidden-anim">
               <div className="pillar-accent-bar" />
-              <h3 className="pillar-name">Sustainability</h3>
-              <p className="pillar-body">
-                All our work aligns with the UN SDGs — connecting youth action to the global frameworks shaping our future.
-              </p>
+              <h3 className="pillar-name">{text("pillar_3_title", "Sustainability")}</h3>
+              <p className="pillar-body">{text("pillar_3_body", "All our work aligns with the UN SDGs — connecting youth action to the global frameworks shaping our future.")}</p>
             </article>
           </div>
         </div>

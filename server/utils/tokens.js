@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
-const ACCESS_TTL = "15m";
+const ACCESS_TTL = "24h";
 const REFRESH_DAYS = 7;
 
 export function signAccessToken(user) {

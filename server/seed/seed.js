@@ -96,6 +96,9 @@ const DEFAULT_TEXTS = [
     value: "Policy briefs, forum recaps, and updates from our global youth delegates.",
   },
   { key: "footer_tagline", label: "Footer — Tagline", section: "footer", value: "Empowering young people to shape global policy on sustainable development — from every corner of the world." },
+  { key: "gov_title", label: "Governance — Section Title", section: "governance", value: "How GYSC is Structured" },
+  { key: "gov_desc", label: "Governance — Description", section: "governance", value: "A four-tier structure designed for democratic participation at every level — from community projects to international policy." },
+  { key: "gov_stat", label: "Governance — Stat Label", section: "governance", value: "4 levels of governance" },
 ];
 
 const DEFAULT_NEWSLETTERS = [
