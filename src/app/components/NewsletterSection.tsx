@@ -40,7 +40,7 @@ export function NewsletterSection() {
                             <Link to={`/newsletters/${n._id}`} className="pub-link pub-link-primary">
                               <FileText size={15} /> View
                             </Link>
-                            <a href={n.pdfUrl!} download={fileName} className="pub-link">
+                            <a href={`/api/content/newsletters/${n._id}/download`} download={fileName} className="pub-link">
                               <Download size={15} /> Download
                             </a>
                           </>

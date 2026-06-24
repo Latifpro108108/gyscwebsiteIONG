@@ -18,8 +18,8 @@ export function NewsletterReaderPage() {
   }
 
   const fileName = newsletterDownloadName(newsletter.issue, newsletter.title);
-  // Use the Cloudinary URL directly — avoids server proxy issues with raw/PDF resources
-  const pdfDirectUrl = newsletter.pdfUrl?.trim() || "";
+  // Use server proxy endpoints — same origin avoids CORS issues with Cloudinary
+  const viewUrl = `/api/content/newsletters/${newsletter._id}/pdf`;
   const downloadUrl = `/api/content/newsletters/${newsletter._id}/download`;
 
   return (
@@ -45,7 +45,7 @@ export function NewsletterReaderPage() {
 
         {newsletter.pdfUrl?.trim() ? (
           <Suspense fallback={<div className="newsletter-reader-empty"><p style={{ color: T.muted }}>Loading reader…</p></div>}>
-            <PdfViewer url={pdfDirectUrl} title={`${newsletter.issue} — ${newsletter.title}`} />
+            <PdfViewer url={viewUrl} title={`${newsletter.issue} — ${newsletter.title}`} />
           </Suspense>
         ) : (
           <div className="newsletter-reader-empty">

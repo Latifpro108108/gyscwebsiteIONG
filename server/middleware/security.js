@@ -11,7 +11,7 @@ export const securityHeaders = helmet({
       mediaSrc: ["'self'", "data:", "blob:"],
       scriptSrc: ["'self'"],
       workerSrc: ["'self'", "blob:"],
-      connectSrc: ["'self'", "blob:"],
+      connectSrc: ["'self'", "blob:", "https://res.cloudinary.com"],
       frameSrc: ["'self'"],
       objectSrc: ["'none'"],
     },

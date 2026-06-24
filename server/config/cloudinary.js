@@ -25,6 +25,7 @@ export async function uploadFile(buffer, folder, publicId, resourceType = "auto"
         public_id: id,
         overwrite: true,
         resource_type: resourceType,
+        access_mode: "public",
       },
       (err, result) => (err ? reject(err) : resolve(result)),
     );

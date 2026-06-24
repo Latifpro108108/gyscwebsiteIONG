@@ -12,50 +12,24 @@ function safeFilename(issue, title) {
   return `${base || "gysc-newsletter"}.pdf`;
 }
 
-async function streamNewsletterPdf(item, res, disposition) {
-  if (!item.pdfUrl?.startsWith("http")) {
-    res.status(404).json({ message: "PDF file URL is missing or invalid" });
-    return;
-  }
-
-  // Try to proxy first; fall back to redirect if Cloudinary blocks the server fetch
-  try {
-    const response = await fetch(item.pdfUrl, {
-      headers: { "User-Agent": "GYSC-Server/1.0" },
-    });
-
-    if (!response.ok) {
-      // Cloudinary blocked the server-side fetch — redirect the client directly
-      console.warn(`Cloudinary proxy failed (${response.status}), redirecting client to: ${item.pdfUrl}`);
-      return res.redirect(302, item.pdfUrl);
-    }
-
-    const buffer = Buffer.from(await response.arrayBuffer());
-    const filename = safeFilename(item.issue, item.title);
-
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `${disposition}; filename="${filename}"`);
-    res.setHeader("Content-Length", buffer.length);
-    res.setHeader("Cache-Control", "public, max-age=300");
-    res.send(buffer);
-  } catch (fetchErr) {
-    // Network error reaching Cloudinary — redirect client directly
-    console.warn("Cloudinary proxy fetch error, redirecting:", fetchErr.message);
-    res.redirect(302, item.pdfUrl);
-  }
-}
-
+/* ── Serve PDF directly from MongoDB ── */
 router.get("/newsletters/:id/pdf", async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ message: "Invalid publication id" });
     }
-    const item = await Newsletter.findById(req.params.id).lean();
+    const item = await Newsletter.findById(req.params.id).select("pdfData pdfFileName issue title pdfUrl");
     if (!item) return res.status(404).json({ message: "Publication not found" });
-    if (!item.pdfUrl?.trim()) {
-      return res.status(404).json({ message: "No PDF uploaded for this publication yet. Upload one in Admin → Newsletters." });
+    if (!item.pdfData || !item.pdfData.length) {
+      return res.status(404).json({ message: "No PDF uploaded for this publication yet." });
     }
-    await streamNewsletterPdf(item, res, "inline");
+
+    const filename = safeFilename(item.issue, item.title);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
+    res.setHeader("Content-Length", item.pdfData.length);
+    res.setHeader("Cache-Control", "public, max-age=300");
+    res.send(item.pdfData);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -66,24 +40,31 @@ router.get("/newsletters/:id/download", async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ message: "Invalid publication id" });
     }
-    const item = await Newsletter.findById(req.params.id).lean();
+    const item = await Newsletter.findById(req.params.id).select("pdfData pdfFileName issue title pdfUrl");
     if (!item) return res.status(404).json({ message: "Publication not found" });
-    if (!item.pdfUrl?.trim()) {
-      return res.status(404).json({ message: "No PDF uploaded for this publication yet. Upload one in Admin → Newsletters." });
+    if (!item.pdfData || !item.pdfData.length) {
+      return res.status(404).json({ message: "No PDF uploaded for this publication yet." });
     }
-    await streamNewsletterPdf(item, res, "attachment");
+
+    const filename = safeFilename(item.issue, item.title);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Length", item.pdfData.length);
+    res.setHeader("Cache-Control", "public, max-age=300");
+    res.send(item.pdfData);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
+/* ── Public content listing ── */
 router.get("/", async (_req, res) => {
   try {
     const [images, texts, founders, newsletters] = await Promise.all([
       SiteImage.find().sort({ section: 1, key: 1 }).lean(),
       SiteText.find().sort({ section: 1, key: 1 }).lean(),
       Founder.find().sort({ order: 1 }).lean(),
-      Newsletter.find().sort({ createdAt: -1 }).lean(),
+      Newsletter.find().select("-pdfData").sort({ createdAt: -1 }).lean(),
     ]);
 
     const textMap = Object.fromEntries(texts.map((t) => [t.key, t.value]));

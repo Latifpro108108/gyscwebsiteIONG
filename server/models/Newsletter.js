@@ -11,6 +11,9 @@ const newsletterSchema = new mongoose.Schema(
     coverCloudinaryPublicId: { type: String, default: "" },
     pdfUrl: { type: String, default: "" },
     pdfCloudinaryPublicId: { type: String, default: "" },
+    // Store PDF directly in MongoDB — no external storage needed
+    pdfData: { type: Buffer },
+    pdfFileName: { type: String, default: "" },
   },
   { timestamps: true },
 );

@@ -378,22 +378,19 @@ function FounderEditor({ founder, run, busy }: { founder: Founder; run: Function
 function NewslettersTab({ newsletters, run, busy }: { newsletters: Newsletter[]; run: Function; busy: boolean }) {
   const empty = { issue: "", date: "", title: "", excerpt: "", color: "#0f9f6f" };
   const [form, setForm] = useState(empty);
-  const [cover, setCover] = useState<File | null>(null);
   const [pdf, setPdf] = useState<File | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
   const [localError, setLocalError] = useState("");
 
-  function buildFormData(data: typeof empty, c?: File | null, p?: File | null) {
+  function buildFormData(data: typeof empty, p?: File | null) {
     const fd = new FormData();
     Object.entries(data).forEach(([k, v]) => fd.append(k, v));
-    if (c) fd.append("cover", c);
     if (p) fd.append("pdf", p);
     return fd;
   }
 
   function resetForm() {
     setForm(empty);
-    setCover(null);
     setPdf(null);
     setEditId(null);
     setLocalError("");
@@ -411,7 +408,7 @@ function NewslettersTab({ newsletters, run, busy }: { newsletters: Newsletter[];
     }
     setLocalError("");
     run(async () => {
-      const fd = buildFormData(form, cover, pdf);
+      const fd = buildFormData(form, pdf);
       if (editId) await api.updateNewsletter(editId, fd);
       else await api.createNewsletter(fd);
       resetForm();
@@ -430,7 +427,6 @@ function NewslettersTab({ newsletters, run, busy }: { newsletters: Newsletter[];
         <input placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} style={{ width: "100%", height: 42, padding: "0 12px", borderRadius: 8, border: `1px solid ${T.border}`, marginBottom: 12 }} />
         <textarea placeholder="Excerpt" value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} rows={3} style={{ width: "100%", padding: 12, borderRadius: 8, border: `1px solid ${T.border}`, fontFamily: "inherit", marginBottom: 12 }} />
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
-          <label style={{ fontSize: 13, color: T.body }}>Cover image: <input type="file" accept="image/*" onChange={(e) => setCover(e.target.files?.[0] || null)} /></label>
           <label style={{ fontSize: 13, color: T.body }}>PDF file (required for Read/Download): <input type="file" accept=".pdf,application/pdf" onChange={(e) => setPdf(e.target.files?.[0] || null)} /></label>
         </div>
         {editId && newsletters.find((n) => n._id === editId)?.pdfUrl && !pdf && (

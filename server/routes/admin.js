@@ -202,11 +202,12 @@ router.delete("/founders/:id/image", async (req, res) => {
 
 /* ── Newsletters ── */
 router.get("/newsletters", async (_req, res) => {
-  const items = await Newsletter.find().sort({ createdAt: -1 });
+  // Exclude pdfData from listing (it's large binary data)
+  const items = await Newsletter.find().select("-pdfData").sort({ createdAt: -1 });
   res.json(items);
 });
 
-router.post("/newsletters", upload.fields([{ name: "cover", maxCount: 1 }, { name: "pdf", maxCount: 1 }]), async (req, res) => {
+router.post("/newsletters", upload.fields([{ name: "pdf", maxCount: 1 }]), async (req, res) => {
   try {
     const { issue, date, title, excerpt, color } = req.body;
     if (!issue || !date || !title || !excerpt) {
@@ -216,27 +217,25 @@ router.post("/newsletters", upload.fields([{ name: "cover", maxCount: 1 }, { nam
       return res.status(400).json({ message: "PDF file is required when publishing a newsletter" });
     }
 
-    const item = new Newsletter({ issue, date, title, excerpt, color: color || "#0f9f6f" });
-
-    if (req.files?.cover?.[0]) {
-      const result = await uploadImage(req.files.cover[0].buffer, "newsletters", `cover-${Date.now()}`);
-      item.coverImageUrl = result.secure_url;
-      item.coverCloudinaryPublicId = result.public_id;
-    }
-    if (req.files?.pdf?.[0]) {
-      const result = await uploadFile(req.files.pdf[0].buffer, "newsletters", `pdf-${Date.now()}`, "raw");
-      item.pdfUrl = result.secure_url;
-      item.pdfCloudinaryPublicId = result.public_id;
-    }
+    const pdfFile = req.files.pdf[0];
+    const item = new Newsletter({
+      issue, date, title, excerpt, color: color || "#0f9f6f",
+      pdfData: pdfFile.buffer,
+      pdfFileName: pdfFile.originalname || "newsletter.pdf",
+      pdfUrl: "stored-in-db",
+    });
 
     await item.save();
-    res.status(201).json(item);
+    // Return without the pdfData blob
+    const obj = item.toObject();
+    delete obj.pdfData;
+    res.status(201).json(obj);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-router.put("/newsletters/:id", upload.fields([{ name: "cover", maxCount: 1 }, { name: "pdf", maxCount: 1 }]), async (req, res) => {
+router.put("/newsletters/:id", upload.fields([{ name: "pdf", maxCount: 1 }]), async (req, res) => {
   try {
     const item = await Newsletter.findById(req.params.id);
     if (!item) return res.status(404).json({ message: "Newsletter not found" });
@@ -248,21 +247,17 @@ router.put("/newsletters/:id", upload.fields([{ name: "cover", maxCount: 1 }, { 
     if (excerpt !== undefined) item.excerpt = excerpt;
     if (color !== undefined) item.color = color;
 
-    if (req.files?.cover?.[0]) {
-      if (item.coverCloudinaryPublicId) await deleteAsset(item.coverCloudinaryPublicId);
-      const result = await uploadImage(req.files.cover[0].buffer, "newsletters", `cover-${item._id}`);
-      item.coverImageUrl = result.secure_url;
-      item.coverCloudinaryPublicId = result.public_id;
-    }
     if (req.files?.pdf?.[0]) {
-      if (item.pdfCloudinaryPublicId) await deleteAsset(item.pdfCloudinaryPublicId, "raw");
-      const result = await uploadFile(req.files.pdf[0].buffer, "newsletters", `pdf-${item._id}`, "raw");
-      item.pdfUrl = result.secure_url;
-      item.pdfCloudinaryPublicId = result.public_id;
+      const pdfFile = req.files.pdf[0];
+      item.pdfData = pdfFile.buffer;
+      item.pdfFileName = pdfFile.originalname || "newsletter.pdf";
+      item.pdfUrl = "stored-in-db";
     }
 
     await item.save();
-    res.json(item);
+    const obj = item.toObject();
+    delete obj.pdfData;
+    res.json(obj);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -272,10 +267,6 @@ router.delete("/newsletters/:id", async (req, res) => {
   try {
     const item = await Newsletter.findById(req.params.id);
     if (!item) return res.status(404).json({ message: "Newsletter not found" });
-
-    if (item.coverCloudinaryPublicId) await deleteAsset(item.coverCloudinaryPublicId);
-    if (item.pdfCloudinaryPublicId) await deleteAsset(item.pdfCloudinaryPublicId, "raw");
-
     await item.deleteOne();
     res.json({ message: "Newsletter deleted" });
   } catch (err) {
@@ -287,11 +278,13 @@ router.delete("/newsletters/:id/pdf", async (req, res) => {
   try {
     const item = await Newsletter.findById(req.params.id);
     if (!item) return res.status(404).json({ message: "Newsletter not found" });
-    if (item.pdfCloudinaryPublicId) await deleteAsset(item.pdfCloudinaryPublicId, "raw");
+    item.pdfData = undefined;
+    item.pdfFileName = "";
     item.pdfUrl = "";
-    item.pdfCloudinaryPublicId = "";
     await item.save();
-    res.json(item);
+    const obj = item.toObject();
+    delete obj.pdfData;
+    res.json(obj);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
