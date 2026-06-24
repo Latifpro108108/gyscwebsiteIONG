@@ -8,6 +8,7 @@ export const securityHeaders = helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https://images.unsplash.com"],
+      mediaSrc: ["'self'", "data:", "blob:"],
       scriptSrc: ["'self'"],
       workerSrc: ["'self'", "blob:"],
       connectSrc: ["'self'", "blob:"],

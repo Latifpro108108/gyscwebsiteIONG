@@ -53,7 +53,6 @@ export function Footer() {
             {user && (
               <button className="footer-link" onClick={() => goTo("/account")} style={{ fontSize: 12 }}>Account</button>
             )}
-            <button className="footer-link" onClick={() => goTo("/admin/login")} style={{ fontSize: 12 }}>Admin</button>
             <button className="footer-link" onClick={openCookiePreferences} style={{ fontSize: 12 }}>Cookies</button>
           </div>
         </div>

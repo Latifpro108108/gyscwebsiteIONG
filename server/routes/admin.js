@@ -107,8 +107,10 @@ router.get("/audit-log", superAdminRequired, async (_req, res) => {
 router.put("/images/:key", upload.single("image"), async (req, res) => {
   try {
     const { key } = req.params;
-    const doc = await SiteImage.findOne({ key });
-    if (!doc) return res.status(404).json({ message: "Image slot not found" });
+    let doc = await SiteImage.findOne({ key });
+    if (!doc) {
+      doc = new SiteImage({ key, url: "", section: "general" });
+    }
     if (!req.file) return res.status(400).json({ message: "Image file is required" });
 
     if (doc.cloudinaryPublicId) {
@@ -148,8 +150,11 @@ router.delete("/images/:key", async (req, res) => {
 router.put("/texts/:key", async (req, res) => {
   try {
     const { value } = req.body;
-    const doc = await SiteText.findOneAndUpdate({ key: req.params.key }, { value: value ?? "" }, { new: true });
-    if (!doc) return res.status(404).json({ message: "Text field not found" });
+    const doc = await SiteText.findOneAndUpdate(
+      { key: req.params.key },
+      { value: value ?? "" },
+      { new: true, upsert: true }
+    );
     res.json(doc);
   } catch (err) {
     res.status(500).json({ message: err.message });

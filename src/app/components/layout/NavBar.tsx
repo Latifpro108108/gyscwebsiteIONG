@@ -11,7 +11,7 @@ export function NavBar() {
   const [open, setOpen] = useState(false);
   const { goTo } = useSiteNavigation();
   const { image } = useContent();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const logo = image("site_logo");
 
   useEffect(() => {
@@ -42,6 +42,9 @@ export function NavBar() {
               <button className="btn btn-primary btn-sm" onClick={() => navigate("/register")}>Join</button>
             </>
           )}
+          {isAdmin && (
+            <button className="btn btn-primary btn-sm" style={{ backgroundColor: "#0f9f6f", borderColor: "#0f9f6f", color: "#fff" }} onClick={() => navigate("/admin")}>Edit Site</button>
+          )}
         </div>
 
         <button className="mob nav-menu-btn" onClick={() => setOpen((o) => !o)} aria-label="Toggle menu">
@@ -58,6 +61,11 @@ export function NavBar() {
             <div className="mob-nav-cta">
               <button className="btn btn-ghost btn-fw" onClick={() => navigate("/login")}>Login</button>
               <button className="btn btn-primary btn-fw" onClick={() => navigate("/register")}>Join</button>
+            </div>
+          )}
+          {isAdmin && (
+            <div className="mob-nav-cta">
+              <button className="btn btn-primary btn-fw" style={{ backgroundColor: "#0f9f6f", borderColor: "#0f9f6f", color: "#fff" }} onClick={() => navigate("/admin")}>Edit Site</button>
             </div>
           )}
         </div>
