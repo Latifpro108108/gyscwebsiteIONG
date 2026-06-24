@@ -16,7 +16,7 @@ export function AdminLoginPage() {
     setError("");
     try {
       const user = await login(email, password);
-      if (user.role !== "admin") {
+      if (user.role !== "admin" && user.role !== "super_admin") {
         setError("This account does not have admin access.");
         return;
       }

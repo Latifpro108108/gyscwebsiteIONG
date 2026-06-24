@@ -133,7 +133,7 @@ function MembersPanel() {
   const [members, setMembers] = useState<AuthUser[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState<{ action: "suspend" | "delete" | "promote"; member: AuthUser } | null>(null);
+  const [modal, setModal] = useState<{ action: "suspend" | "delete"; member: AuthUser } | null>(null);
   const [busy, setBusy] = useState(false);
 
   function load(q = query) {
@@ -191,9 +191,6 @@ function MembersPanel() {
                 <td>
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                     <button type="button" className="btn btn-ghost btn-sm" onClick={() => alert(`${m.name}\n${m.email}\n${m.country || ""}`)}>View</button>
-                    {m.role === "member" && (
-                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setModal({ action: "promote", member: m })}>Promote</button>
-                    )}
                     {m.status !== "suspended" && (
                       <button type="button" className="btn btn-ghost btn-sm" onClick={() => setModal({ action: "suspend", member: m })}>Suspend</button>
                     )}
@@ -213,7 +210,6 @@ function MembersPanel() {
             <p>
               {modal.action === "delete" && `Permanently delete ${modal.member.email}? This cannot be undone.`}
               {modal.action === "suspend" && `Suspend ${modal.member.email}? They will lose access until reactivated.`}
-              {modal.action === "promote" && `Promote ${modal.member.email} to admin?`}
             </p>
             <div className="admin-modal-actions">
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => setModal(null)} disabled={busy}>Cancel</button>

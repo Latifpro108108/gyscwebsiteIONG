@@ -62,9 +62,8 @@ router.patch("/members/:id", blockSuperAdminTarget, async (req, res) => {
       return res.status(403).json({ error: "This account cannot be modified." });
     }
 
-    const { status, role } = req.body;
+    const { status } = req.body;
     if (status) user.status = status;
-    if (role && ["member", "admin"].includes(role)) user.role = role;
 
     await user.save();
     await AuditLog.create({
