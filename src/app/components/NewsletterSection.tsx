@@ -2,7 +2,7 @@ import { Download, FileText } from "lucide-react";
 import { Link } from "react-router";
 import { Reveal } from "@/app/components/shared";
 import { useContent } from "@/app/context/ContentContext";
-import { getNewsletterApiUrls, groupNewslettersByYear, newsletterDownloadName } from "@/app/lib/newsletter";
+import { groupNewslettersByYear, newsletterDownloadName } from "@/app/lib/newsletter";
 
 export function NewsletterSection() {
   const { newsletters } = useContent();
@@ -20,7 +20,6 @@ export function NewsletterSection() {
               <ul className="pub-list">
                 {items.map((n) => {
                   const hasPdf = Boolean(n.pdfUrl?.trim());
-                  const { view, download } = getNewsletterApiUrls(n._id);
                   const fileName = newsletterDownloadName(n.issue, n.title);
 
                   return (
@@ -41,7 +40,7 @@ export function NewsletterSection() {
                             <Link to={`/newsletters/${n._id}`} className="pub-link pub-link-primary">
                               <FileText size={15} /> View
                             </Link>
-                            <a href={download} download={fileName} className="pub-link">
+                            <a href={n.pdfUrl!} download={fileName} className="pub-link">
                               <Download size={15} /> Download
                             </a>
                           </>

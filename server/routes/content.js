@@ -18,20 +18,31 @@ async function streamNewsletterPdf(item, res, disposition) {
     return;
   }
 
-  const response = await fetch(item.pdfUrl);
-  if (!response.ok) {
-    res.status(502).json({ message: "Could not retrieve PDF from storage" });
-    return;
+  // Try to proxy first; fall back to redirect if Cloudinary blocks the server fetch
+  try {
+    const response = await fetch(item.pdfUrl, {
+      headers: { "User-Agent": "GYSC-Server/1.0" },
+    });
+
+    if (!response.ok) {
+      // Cloudinary blocked the server-side fetch — redirect the client directly
+      console.warn(`Cloudinary proxy failed (${response.status}), redirecting client to: ${item.pdfUrl}`);
+      return res.redirect(302, item.pdfUrl);
+    }
+
+    const buffer = Buffer.from(await response.arrayBuffer());
+    const filename = safeFilename(item.issue, item.title);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `${disposition}; filename="${filename}"`);
+    res.setHeader("Content-Length", buffer.length);
+    res.setHeader("Cache-Control", "public, max-age=300");
+    res.send(buffer);
+  } catch (fetchErr) {
+    // Network error reaching Cloudinary — redirect client directly
+    console.warn("Cloudinary proxy fetch error, redirecting:", fetchErr.message);
+    res.redirect(302, item.pdfUrl);
   }
-
-  const buffer = Buffer.from(await response.arrayBuffer());
-  const filename = safeFilename(item.issue, item.title);
-
-  res.setHeader("Content-Type", "application/pdf");
-  res.setHeader("Content-Disposition", `${disposition}; filename="${filename}"`);
-  res.setHeader("Content-Length", buffer.length);
-  res.setHeader("Cache-Control", "public, max-age=300");
-  res.send(buffer);
 }
 
 router.get("/newsletters/:id/pdf", async (req, res) => {

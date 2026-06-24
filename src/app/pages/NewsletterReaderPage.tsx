@@ -3,7 +3,7 @@ import { ArrowLeft, Download } from "lucide-react";
 import { Link, Navigate, useParams } from "react-router";
 import { PageShell } from "@/app/components/shared";
 import { useContent } from "@/app/context/ContentContext";
-import { getNewsletterApiUrls, newsletterDownloadName } from "@/app/lib/newsletter";
+import { newsletterDownloadName } from "@/app/lib/newsletter";
 import { T } from "@/app/lib/theme";
 
 const PdfViewer = lazy(() => import("@/app/components/PdfViewer").then((m) => ({ default: m.PdfViewer })));
@@ -17,8 +17,10 @@ export function NewsletterReaderPage() {
     return <Navigate to="/404" replace />;
   }
 
-  const { view, download } = getNewsletterApiUrls(newsletter._id);
   const fileName = newsletterDownloadName(newsletter.issue, newsletter.title);
+  // Use the Cloudinary URL directly — avoids server proxy issues with raw/PDF resources
+  const pdfDirectUrl = newsletter.pdfUrl?.trim() || "";
+  const downloadUrl = `/api/content/newsletters/${newsletter._id}/download`;
 
   return (
     <PageShell>
@@ -35,7 +37,7 @@ export function NewsletterReaderPage() {
           </div>
 
           {newsletter.pdfUrl?.trim() && (
-            <a href={download} download={fileName} className="btn btn-outline-teal btn-sm">
+            <a href={downloadUrl} download={fileName} className="btn btn-outline-teal btn-sm">
               <Download size={14} /> Download PDF
             </a>
           )}
@@ -43,7 +45,7 @@ export function NewsletterReaderPage() {
 
         {newsletter.pdfUrl?.trim() ? (
           <Suspense fallback={<div className="newsletter-reader-empty"><p style={{ color: T.muted }}>Loading reader…</p></div>}>
-            <PdfViewer url={view} title={`${newsletter.issue} — ${newsletter.title}`} />
+            <PdfViewer url={pdfDirectUrl} title={`${newsletter.issue} — ${newsletter.title}`} />
           </Suspense>
         ) : (
           <div className="newsletter-reader-empty">
