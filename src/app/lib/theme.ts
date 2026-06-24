@@ -52,7 +52,7 @@ export const NEWSLETTERS = [
   {
     issue: "Vol. 03",
     date: "November 2025",
-    title: "Expanding Across 14 Countries",
+    title: "Growing Our Global Network",
     excerpt: "New National Councils are taking shape across Africa, Asia, and the Americas. Meet the leads driving our global expansion.",
     color: "#A21942",
   },

@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { api, Founder, Newsletter, SiteContent, SiteImage, SiteText } from "@/app/lib/api";
-import defaultLogo from "@/imports/IMG-20260607-WA0005.jpg";
+import defaultLogo from "@/imports/IMG-20260607-WA0005-removebg-preview.png";
 import { ABOUT_IMG, HERO_BG } from "@/app/lib/theme";
 
 const IMAGE_FALLBACKS: Record<string, string> = {

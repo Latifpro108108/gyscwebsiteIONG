@@ -13,7 +13,7 @@ export function JoinPage() {
           Join the Global Youth Sustainability Council
         </h1>
         <p style={{ fontSize: 17, color: T.body, lineHeight: 1.75, maxWidth: 580 }}>
-          Become part of a growing network of youth delegates shaping policy on sustainability, education, and institutional reform across 14 countries.
+          Become part of a growing network of youth delegates shaping policy on sustainability, education, and institutional reform — with members from countries around the world.
         </p>
       </div>
 

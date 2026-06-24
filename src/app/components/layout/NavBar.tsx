@@ -29,7 +29,7 @@ export function NavBar() {
     <nav className={`site-nav${scrolled ? " scrolled" : ""}`}>
       <div className="container nav-inner">
         <button onClick={() => navigate("/")} className="nav-logo-btn" aria-label="GYSC home">
-          <ImageWithFallback src={logo} alt="GYSC" style={{ height: 40, width: "auto", objectFit: "contain" }} />
+          <ImageWithFallback src={logo} alt="GYSC" style={{ height: 46, width: "auto", objectFit: "contain" }} />
         </button>
 
         <div className="desk nav-actions">

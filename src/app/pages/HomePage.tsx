@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
-  ArrowRight, ArrowUpRight, Compass, FileText, Globe, Landmark, Leaf, Lock, MapPin, UserCircle, Users,
+  ArrowRight, ArrowUpRight, Globe, Lock, UserCircle, Users,
 } from "lucide-react";
+import { MissionPulse } from "@/app/components/MissionPulse";
 import { NewsletterSection } from "@/app/components/NewsletterSection";
 import { SDGWheel } from "@/app/components/SDGWheel";
 import { Label, Reveal, SectionIntro } from "@/app/components/shared";
@@ -13,9 +14,9 @@ const STORY_QUOTE =
   "One shared conviction — youth deserve a permanent seat at the global policy table.";
 
 const STORY_PARAGRAPHS = [
-  "In 2025, nine young people from across the globe came together in South Korea. Over five days of intensive dialogue, they drafted a bold policy document — and laid the foundations for the Global Youth Sustainability Council.",
-  "The co-founders authored the Eunpyeong Declaration — a 95-page framework addressing education, climate, inequality, and institutional reform.",
-  "Registered as a Canadian NGO, GYSC now operates across 14 countries — empowering young people to participate meaningfully in global decisions.",
+  "In 2025, at a youth summit in South Korea, our co-founders joined a larger global cohort for five days of intensive dialogue. Together they helped shape a bold policy document — and laid the foundations for the Global Youth Sustainability Council.",
+  "GYSC co-authored the Eunpyeong Declaration alongside peers from all corners of the world — a framework addressing education, climate, inequality, and institutional reform.",
+  "Registered as a Canadian NGO, GYSC brings together members from different countries around the world — raising awareness, deepening engagement, and amplifying youth voices in global conversations.",
 ];
 
 export function HomePage() {
@@ -35,28 +36,152 @@ export function HomePage() {
     setTimeout(() => { setDonating(false); setDonated(true); }, 1600);
   }
 
-  const stats = [
-    { n: text("stat_1_n", "9"), label: text("stat_1_label", "Founding Members") },
-    { n: text("stat_2_n", "95"), label: text("stat_2_label", "Page Policy Framework") },
-    { n: text("stat_3_n", "14"), label: text("stat_3_label", "Countries") },
-    { n: text("stat_4_n", "1"), label: text("stat_4_label", "Official Declaration") },
-  ];
-
   const governance = [
-    { Icon: Users, title: "General Assembly", body: "The supreme deliberative body representing all member delegates." },
-    { Icon: Globe, title: "National Councils", body: "Country-level chapters coordinating local youth policy engagement." },
-    { Icon: MapPin, title: "Local Offices", body: "Community hubs for programmes, forums, and delegate support." },
-    { Icon: Landmark, title: "Leadership Team", body: "Elected officers guiding strategy, operations, and global representation." },
+    { title: "General Assembly", body: "Supreme governing body of three elected representatives per National Office" },
+    { title: "National Councils", body: "Primary engines for national policy, recruitment, and local outreach" },
+    { title: "Local Offices", body: "Grassroots implementation of policy and community projects" },
+    { title: "Leadership Team", body: "Cross-regional strategy and international representation" },
   ];
 
-  const pillars = [
-    { Icon: FileText, title: text("pillar_1_title", "Policy"), body: text("pillar_1_body", ""), hue: T.blue },
-    { Icon: Compass, title: text("pillar_2_title", "Leadership"), body: text("pillar_2_body", ""), hue: T.teal },
-    { Icon: Leaf, title: text("pillar_3_title", "Sustainability"), body: text("pillar_3_body", ""), hue: "#34c759" },
-  ];
+  const govRef = useRef<HTMLElement>(null);
+  const pillarsRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const govEl = govRef.current;
+    if (!govEl) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const leftCol = govEl.querySelector(".gov-left") as HTMLElement;
+          const line = govEl.querySelector(".gov-timeline-line") as HTMLElement;
+          const rows = govEl.querySelectorAll(".gov-tier-row");
+
+          if (leftCol) {
+            leftCol.style.willChange = "transform, opacity";
+            setTimeout(() => {
+              leftCol.classList.remove("hidden-anim");
+              setTimeout(() => {
+                leftCol.style.willChange = "auto";
+                leftCol.classList.remove("animating");
+              }, 500);
+            }, 0);
+          }
+
+          if (line) {
+            line.style.willChange = "transform";
+            setTimeout(() => {
+              line.classList.remove("hidden-anim");
+              setTimeout(() => {
+                line.style.willChange = "auto";
+                line.classList.remove("animating");
+              }, 800);
+            }, 0);
+          }
+
+          rows.forEach((rowEl, i) => {
+            const row = rowEl as HTMLElement;
+            row.style.willChange = "transform, opacity";
+            const delay = 800 + i * 120;
+            setTimeout(() => {
+              row.classList.remove("hidden-anim");
+              setTimeout(() => {
+                row.style.willChange = "auto";
+                row.classList.remove("animating");
+              }, 400);
+            }, delay);
+          });
+
+          observer.unobserve(govEl);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(govEl);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const pillarsEl = pillarsRef.current;
+    if (!pillarsEl) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const header = pillarsEl.querySelector(".pillars-header") as HTMLElement;
+          const policy = pillarsEl.querySelector(".policy-card") as HTMLElement;
+          const leadership = pillarsEl.querySelector(".leadership-card") as HTMLElement;
+          const sustainability = pillarsEl.querySelector(".sustainability-card") as HTMLElement;
+
+          if (header) {
+            header.style.willChange = "transform, opacity";
+            setTimeout(() => {
+              header.classList.remove("hidden-anim");
+              setTimeout(() => {
+                header.style.willChange = "auto";
+                header.classList.remove("animating");
+              }, 400);
+            }, 0);
+          }
+
+          if (policy) {
+            policy.style.willChange = "transform, opacity";
+            setTimeout(() => {
+              policy.classList.remove("hidden-anim");
+              setTimeout(() => {
+                policy.style.willChange = "auto";
+                policy.classList.remove("animating");
+              }, 500);
+            }, 100);
+          }
+
+          if (leadership) {
+            leadership.style.willChange = "transform, opacity";
+            setTimeout(() => {
+              leadership.classList.remove("hidden-anim");
+              setTimeout(() => {
+                leadership.style.willChange = "auto";
+                leadership.classList.remove("animating");
+              }, 500);
+            }, 200);
+          }
+
+          if (sustainability) {
+            sustainability.style.willChange = "transform, opacity";
+            setTimeout(() => {
+              sustainability.classList.remove("hidden-anim");
+              setTimeout(() => {
+                sustainability.style.willChange = "auto";
+                sustainability.classList.remove("animating");
+              }, 500);
+            }, 350);
+          }
+
+          observer.unobserve(pillarsEl);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(pillarsEl);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="site-main">
+      {/* --- Ambient Background Layer --- */}
+      <div className="ambient-bg" aria-hidden="true">
+        <div className="ambient-orb orb-1" />
+        <div className="ambient-orb orb-2" />
+        <svg className="ambient-particle" style={{ top: '15%', left: '5%', animation: 'floatParticle 20s infinite ease-in-out' }} width="40" height="40" viewBox="0 0 40 40">
+          <circle cx="20" cy="20" r="16" />
+          <path d="M10 20h20M20 10v20" />
+        </svg>
+        <svg className="ambient-particle" style={{ top: '65%', right: '8%', animation: 'spinSlow 30s infinite linear' }} width="40" height="40" viewBox="0 0 40 40">
+          <rect x="8" y="8" width="24" height="24" rx="4" />
+        </svg>
+        <svg className="ambient-particle" style={{ top: '40%', right: '4%', animation: 'floatParticle 25s infinite ease-in-out reverse' }} width="30" height="30" viewBox="0 0 30 30">
+          <path d="M15 5v20M5 15h20" />
+        </svg>
+      </div>
+
       {/* ── HERO ── */}
       <section className="hero">
         <div className="hero-bg" style={{ backgroundImage: `url(${heroBg})` }} />
@@ -80,22 +205,27 @@ export function HomePage() {
               </div>
 
               <h1 className="hero-title">
-                <span className="hero-line anim-fade-up d1">{text("hero_line1", "Young people.")}</span>
+                <span className="hero-line anim-fade-up d1">
+                  <span style={{color: '#0f9f6f'}}>Young</span> people.
+                </span>
                 <span className="hero-line anim-fade-up d2">
                   <span className="hero-highlight">
-                    {text("hero_line2", "Real policy.")}
+                    <span style={{color: '#38bdf8'}}>Real</span> policy.
                     <span className="hero-underline anim-line-grow" />
                   </span>
                 </span>
-                <span className="hero-line anim-fade-up d3">{text("hero_line3", "Global impact.")}</span>
+                <span className="hero-line anim-fade-up d3">
+                  <span style={{color: '#fbbf24'}}>Global</span> impact.
+                </span>
               </h1>
 
-              <p className="hero-desc anim-fade-up d4">{text("hero_description", "")}</p>
+              <p className="hero-desc anim-fade-up d4">
+                GYSC unites delegates from every continent — turning <span style={{color: '#0f9f6f', fontWeight: '600'}}>youth conviction</span> into policies that reach the highest levels of <span style={{color: '#0f9f6f', fontWeight: '600'}}>global governance</span>.
+              </p>
 
               <div className="hero-btns anim-fade-up d5">
                 <button className="btn btn-white" onClick={() => goTo("/register")}>Join GYSC <ArrowRight size={16} /></button>
                 <button className="btn btn-outline-white" onClick={() => goTo("/partner")}>Partner With Us</button>
-                <button className="btn btn-outline-white" onClick={() => goTo("/#about")}>About GYSC</button>
               </div>
             </div>
 
@@ -106,19 +236,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ── STATS ── */}
-      <div className="stats-band">
-        <div className="container">
-          <div className="stats-grid">
-            {stats.map((s) => (
-              <div key={s.label} className="stat-item">
-                <div className="stat-number">{s.n}</div>
-                <div className="stat-label">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <MissionPulse />
 
       {/* ── OUR STORY ── */}
       <section id="about" className="section story-section">
@@ -128,12 +246,12 @@ export function HomePage() {
             <Reveal cls="rev-l">
               <div className="story-visual">
                 <div className="story-image-frame">
-                  <img src={aboutImg} alt="GYSC co-founders and delegates" className="story-image" />
+                  <img src={aboutImg} alt="GYSC delegates at a global youth summit" className="story-image" />
                   <div className="story-image-overlay" aria-hidden />
                 </div>
-                <div className="story-float-card">
-                  <span className="story-float-num">9</span>
-                  <span className="story-float-label">Co-founders · 14 countries</span>
+                <div className="story-float-card story-float-card--badge">
+                  <span className="story-float-pulse" aria-hidden />
+                  <span className="story-float-label">Canadian NGO · Global network</span>
                 </div>
               </div>
             </Reveal>
@@ -162,42 +280,87 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ── GOVERNANCE ── */}
-      <section id="governance" className="section section-surface">
+      {/* ── NEWSLETTER ── */}
+      <section id="newsletter" className="section section-white">
         <div className="container">
           <Reveal>
-            <SectionIntro label="Governance" title="How GYSC is structured" description="A transparent model connecting local youth voices to global policy work." />
+            <SectionIntro label="Publications" title={text("newsletter_title", "GYSC Newsletter")} description={text("newsletter_desc", "")} />
           </Reveal>
-          <div className="gov-grid">
-            {governance.map(({ Icon, title, body }, i) => (
-              <Reveal key={title} delay={i * 70}>
-                <div className="gov-card">
-                  <div className="gov-icon"><Icon size={22} color={T.navy} strokeWidth={1.5} /></div>
-                  <h3>{title}</h3>
-                  <p>{body}</p>
-                </div>
-              </Reveal>
-            ))}
+          <NewsletterSection />
+        </div>
+      </section>
+
+      {/* ── GOVERNANCE ── */}
+      <section id="governance" ref={govRef} className="governance-section">
+        <div className="container">
+          <div className="governance-grid">
+            {/* Left Column (40%) */}
+            <div className="gov-left animating hidden-anim">
+              <div className="gov-left-label">GOVERNANCE</div>
+              <div className="gov-left-bar-container">
+                <div className="gov-left-bar" />
+                <h2 className="gov-left-heading">How GYSC is Structured</h2>
+              </div>
+              <p className="gov-left-body">
+                A four-tier structure designed for democratic participation at every level — from community projects to international policy.
+              </p>
+              <hr className="gov-left-hr" />
+              <div className="gov-left-stat">4 levels of governance</div>
+            </div>
+
+            {/* Right Column (60%) */}
+            <div className="gov-timeline-container">
+              <div className="gov-timeline-line animating hidden-anim" />
+              <div className="gov-timeline">
+                {governance.map(({ title, body }) => (
+                  <div key={title} className="gov-tier-row animating hidden-anim">
+                    <div className="gov-circle" />
+                    <h3 className="gov-tier-name">{title}</h3>
+                    <p className="gov-tier-desc">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── PILLARS ── */}
-      <section id="pillars" className="section section-surface">
+      <section id="pillars" ref={pillarsRef} className="pillars-section">
         <div className="container">
-          <Reveal>
-            <SectionIntro label="Our Work" title={text("pillars_title", "What we stand for")} description={text("pillars_desc", "")} />
-          </Reveal>
-          <div className="pillar-grid">
-            {pillars.map(({ Icon, title, body, hue }, i) => (
-              <Reveal key={title} delay={i * 90}>
-                <div className="card pillar-card" style={{ "--pillar-accent": hue } as React.CSSProperties}>
-                  <div className="icon-badge pillar-icon"><Icon size={24} color={T.navy} strokeWidth={1.5} /></div>
-                  <h3 className="pillar-title">{title}</h3>
-                  <p className="body-text">{body}</p>
-                </div>
-              </Reveal>
-            ))}
+          <div className="pillars-header animating hidden-anim pillars-header-container">
+            <div className="pillars-label">OUR WORK</div>
+            <h2 className="pillars-heading">{text("pillars_title", "What We Stand For")}</h2>
+            <p className="pillars-subtext">{text("pillars_desc", "Three pillars guiding youth-led policy, leadership, and sustainable action worldwide.")}</p>
+          </div>
+
+          <div className="pillars-layout">
+            {/* Policy card */}
+            <article className="pillar-card policy-card animating hidden-anim">
+              <div className="pillar-accent-bar" />
+              <h3 className="pillar-name">Policy</h3>
+              <p className="pillar-body">
+                We advocate for youth-led policy recommendations in international frameworks and governmental processes.
+              </p>
+            </article>
+
+            {/* Leadership card */}
+            <article className="pillar-card leadership-card animating hidden-anim">
+              <div className="pillar-accent-bar" />
+              <h3 className="pillar-name">Leadership</h3>
+              <p className="pillar-body">
+                We build awareness, create spaces for engagement, and empower young people to raise their voices at local, national, and international levels.
+              </p>
+            </article>
+
+            {/* Sustainability card */}
+            <article className="pillar-card sustainability-card animating hidden-anim">
+              <div className="pillar-accent-bar" />
+              <h3 className="pillar-name">Sustainability</h3>
+              <p className="pillar-body">
+                All our work aligns with the UN SDGs — connecting youth action to the global frameworks shaping our future.
+              </p>
+            </article>
           </div>
         </div>
       </section>
@@ -217,16 +380,6 @@ export function HomePage() {
           </Reveal>
           <SDGWheel />
           <p className="sdg-disclaimer">GYSC operates in alignment with — not on behalf of — the United Nations.</p>
-        </div>
-      </section>
-
-      {/* ── NEWSLETTER ── */}
-      <section id="newsletter" className="section section-white">
-        <div className="container">
-          <Reveal>
-            <SectionIntro label="Publications" title={text("newsletter_title", "GYSC Newsletter")} description={text("newsletter_desc", "")} />
-          </Reveal>
-          <NewsletterSection />
         </div>
       </section>
 
